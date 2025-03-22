@@ -1,21 +1,30 @@
 import streamlit as st
 import joblib
 import os
+import requests
+
+MODEL_URL = "https://raw.githubusercontent.com/Wajiha-ui/nyx-size-recommender-Brand-Purpose-/main/size_recommender.pkl"
+MODEL_PATH = "size_recommender.pkl"
+
+def download_model():
+    response = requests.get(MODEL_URL)
+    if response.status_code == 200:
+        with open(MODEL_PATH, "wb") as f:
+            f.write(response.content)
+        return True
+    return False
 
 def load_model():
-    file_path = os.path.join(os.path.dirname(__file__), "size_recommender.pkl")
-    
-    # Debugging: Check if the file exists
-    if not os.path.exists(file_path):
-        st.error(f"Model file not found at {file_path}")
-        return None
-    
-    return joblib.load(file_path)
+    if not os.path.exists(MODEL_PATH):
+        st.warning("Downloading model...")
+        if not download_model():
+            st.error("Failed to download model")
+            return None
+    return joblib.load(MODEL_PATH)
 
 st.title("Nyx Size Recommender")
 st.write("Welcome to the Nyx Size Recommender app!")
 
-# Try loading the model
 model = load_model()
 if model:
     st.success("Model loaded successfully!")
