@@ -1,32 +1,28 @@
 import streamlit as st
 import joblib
-import os
-import requests
+import numpy as np
 
-MODEL_URL = "https://raw.githubusercontent.com/Wajiha-ui/nyx-size-recommender-Brand-Purpose-/main/size_recommender.pkl"
-MODEL_PATH = "size_recommender.pkl"
-
-def download_model():
-    response = requests.get(MODEL_URL)
-    if response.status_code == 200:
-        with open(MODEL_PATH, "wb") as f:
-            f.write(response.content)
-        return True
-    return False
-
+# Load the trained model
+@st.cache_resource
 def load_model():
-    if not os.path.exists(MODEL_PATH):
-        st.warning("Downloading model...")
-        if not download_model():
-            st.error("Failed to download model")
-            return None
-    return joblib.load(MODEL_PATH)
+    return joblib.load("size_recommender.pkl")
+
+model = load_model()
 
 st.title("Nyx Size Recommender")
 st.write("Welcome to the Nyx Size Recommender app!")
 
-model = load_model()
-if model:
-    st.success("Model loaded successfully!")
-else:
-    st.error("Failed to load model.")
+# Create input fields
+height = st.number_input("Enter height (cm):", min_value=100, max_value=250, value=170)
+weight = st.number_input("Enter weight (kg):", min_value=30, max_value=200, value=70)
+age = st.number_input("Enter age:", min_value=10, max_value=100, value=25)
+
+# Button to make predictions
+if st.button("Recommend Size"):
+    # Convert input into a NumPy array
+    input_data = np.array([[height, weight, age]])
+    
+    # Predict the size
+    prediction = model.predict(input_data)
+
+    st.success(f"Recommended Size: {prediction[0]}")
