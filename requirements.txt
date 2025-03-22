@@ -1,5 +1,12 @@
-streamlit
-numpy
 pandas
+numpy
 scikit-learn
 joblib
+streamlit
+matplotlib
+seaborn
+xgboost
+lightgbm
+catboost
+tensorflow
+imblearn
