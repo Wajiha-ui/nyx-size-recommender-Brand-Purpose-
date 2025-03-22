@@ -1,23 +1,23 @@
 import streamlit as st
 import joblib
-import numpy as np
+import os
 
-# Load the trained model
-@st.cache_resource
 def load_model():
-    return joblib.load("size_recommender.pkl")
+    file_path = os.path.join(os.path.dirname(__file__), "size_recommender.pkl")
+    
+    # Debugging: Check if the file exists
+    if not os.path.exists(file_path):
+        st.error(f"Model file not found at {file_path}")
+        return None
+    
+    return joblib.load(file_path)
 
-model = load_model()
-
-# Streamlit UI
 st.title("Nyx Size Recommender")
-st.write("Enter your details to get a recommended size.")
+st.write("Welcome to the Nyx Size Recommender app!")
 
-# Example input fields
-height = st.number_input("Enter your height (cm)", min_value=100, max_value=250)
-weight = st.number_input("Enter your weight (kg)", min_value=30, max_value=200)
-
-if st.button("Get Recommendation"):
-    features = np.array([[height, weight]])
-    size_prediction = model.predict(features)  # Predict size
-    st.write(f"Recommended Size: **{size_prediction[0]}**")
+# Try loading the model
+model = load_model()
+if model:
+    st.success("Model loaded successfully!")
+else:
+    st.error("Failed to load model.")
